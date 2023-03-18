@@ -48,12 +48,13 @@ export class UserService {
 
   async findByLogin(UserDTO: LoginDTO) {
     const { email, password } = UserDTO;
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).select('+password');
 
     if (!user) {
       throw new HttpException('user doesnt exists', HttpStatus.BAD_REQUEST);
     }
 
+    console.log(UserDTO, user, password, user.password);
     if (await bcrypt.compare(password, user.password)) {
       return this.sanitizeUser(user);
     } else {
