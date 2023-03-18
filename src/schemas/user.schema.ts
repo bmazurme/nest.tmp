@@ -4,6 +4,13 @@ import * as bcrypt from 'bcrypt';
 export const UserSchema = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true, select: false },
+  status: { type: String, enum: ['Pending', 'Active'], default: 'Pending' },
+  confirmationCode: {
+    type: String,
+    unique: true,
+    required: true,
+    select: false,
+  },
 });
 
 UserSchema.pre('save', async function (next) {
