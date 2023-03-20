@@ -50,7 +50,7 @@ const sendMail = (
     } else {
       console.log(0);
     }
-    // eslint-disable-next-line no-useless-return
+
     return;
   });
 };

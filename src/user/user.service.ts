@@ -7,11 +7,11 @@ import { User } from '../common/user';
 import { RegisterDTO } from '../common/dto/register.dto';
 import { LoginDTO } from '../common/dto/login.dto';
 import { Payload } from '../common/payload';
-import sendMail from '../common/sendMail';
 
-const CONFIRM = 1;
-const CHARACTERS =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+import sendMail from '../common/sendMail';
+import getToken from '../common/utils/getToken';
+
+import { CONFIRM } from '../common/constant';
 
 @Injectable()
 export class UserService {
@@ -25,12 +25,7 @@ export class UserService {
       throw new HttpException('user already exists', HttpStatus.BAD_REQUEST);
     }
 
-    let token = '';
-
-    for (let i = 0; i < 25; i += 1) {
-      token += CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
-    }
-
+    const token = getToken();
     const createdUser = new this.userModel({
       ...RegisterDTO,
       confirmationCode: token,
@@ -77,14 +72,6 @@ export class UserService {
     }
   }
 
-  sanitizeUser(user: User) {
-    const sanitized = user.toObject();
-    delete sanitized['password'];
-    delete sanitized['confirmationCode'];
-
-    return sanitized;
-  }
-
   async confirmEmail(code: string) {
     const user = await this.userModel
       .findOne({ confirmationCode: code })
@@ -102,5 +89,13 @@ export class UserService {
     }
 
     return '409 conflict';
+  }
+
+  sanitizeUser(user: User) {
+    const sanitized = user.toObject();
+    delete sanitized['password'];
+    delete sanitized['confirmationCode'];
+
+    return sanitized;
   }
 }
