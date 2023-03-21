@@ -1,12 +1,7 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
-import { PasswordService } from './pass.service';
-
-type DataDTO = {
-  email: string;
-  password: string;
-  newPassword?: string;
-};
+import { PasswordService } from './password.service';
+import { UserDTO } from '../common/dto/user.dto';
 
 @Controller('api/password')
 export class PasswordController {
@@ -14,17 +9,17 @@ export class PasswordController {
 
   @Post('update')
   @UseGuards(AuthGuard('jwt'))
-  async update(@Body() dataDTO: DataDTO) {
+  async update(@Body() dataDTO: UserDTO) {
     return await this.passwordService.update(dataDTO);
   }
 
   @Post('reset')
-  async reset(@Body() dataDTO: DataDTO) {
+  async reset(@Body() dataDTO: UserDTO) {
     return await this.passwordService.reset(dataDTO);
   }
 
   @Post('new')
-  async new(@Body() dataDTO: DataDTO & { token: string }) {
+  async new(@Body() dataDTO: UserDTO & { token: string }) {
     return await this.passwordService.new(dataDTO);
   }
 }

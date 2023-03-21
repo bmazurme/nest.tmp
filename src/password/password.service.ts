@@ -3,23 +3,18 @@ import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../common/user';
+import { UserDTO } from '../common/dto/user.dto';
 
 import sendMail from '../common/sendMail';
 import getToken from '../common/utils/getToken';
 
 import { RESET } from '../common/constant';
 
-export interface Payload {
-  email: string;
-  password: string;
-  newPassword?: string;
-}
-
 @Injectable()
 export class PasswordService {
   constructor(@InjectModel('User') private userModel: Model<User>) {}
 
-  async update(payload: Payload) {
+  async update(payload: UserDTO) {
     const { email, password, newPassword } = payload;
     const user = await this.userModel.findOne({ email }).select('+password');
 
@@ -30,7 +25,10 @@ export class PasswordService {
     const matched = bcrypt.compare(password, user.password);
 
     if (!matched) {
-      return Promise.reject(new Error('Incorrect email or password'));
+      throw new HttpException(
+        'incorrect email or password',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
@@ -39,7 +37,7 @@ export class PasswordService {
     return this.sanitizeUser(user);
   }
 
-  async reset(payload: Payload) {
+  async reset(payload: UserDTO) {
     const { email } = payload;
     const user = await this.userModel.findOne({ email });
 
@@ -56,7 +54,7 @@ export class PasswordService {
     return { message: 'message was sent' };
   }
 
-  async new(payload: Payload & { token: string }) {
+  async new(payload: UserDTO & { token: string }) {
     const { email, password, token } = payload;
     const user = await this.userModel
       .findOne({ email })
