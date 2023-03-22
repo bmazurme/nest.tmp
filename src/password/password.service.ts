@@ -5,10 +5,8 @@ import { Model } from 'mongoose';
 import { User } from '../common/user';
 import { UserDTO } from '../common/dto/user.dto';
 
-import sendMail from '../common/sendMail';
+import sendMail, { Email } from '../common/sendMail';
 import getToken from '../common/utils/getToken';
-
-import { RESET } from '../common/constant';
 
 @Injectable()
 export class PasswordService {
@@ -49,7 +47,8 @@ export class PasswordService {
     user.confirmationCode = token;
     user.status = 'Pending';
     user.save();
-    sendMail(email, token, 'login', RESET);
+
+    sendMail(email, token, 'login', Email.Reset);
 
     return { message: 'message was sent' };
   }
@@ -65,7 +64,7 @@ export class PasswordService {
     }
 
     if (user.status === 'Pending' && user.confirmationCode === token) {
-      user.password = await bcrypt.hash(password, 10);
+      user.password = password;
       user.status = 'Active';
       user.save();
 

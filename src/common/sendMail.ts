@@ -1,6 +1,11 @@
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
+export enum Email {
+  Confirm,
+  Reset,
+}
+
 const sendMail = (
   userEmail: string,
   token: string,
@@ -9,7 +14,6 @@ const sendMail = (
 ) => {
   const email = userEmail;
   const confirmationCode = token;
-
   const options: SMTPTransport.Options = {
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT) || 465,
@@ -42,14 +46,13 @@ const sendMail = (
       <a href=${process.env.HOST}/password/new/${confirmationCode}> Click here </a>`,
   };
 
-  const message = type === 1 ? mailOptions : mailOptionsReset;
+  const message = type === 0 ? mailOptions : mailOptionsReset;
 
   mail.sendMail(message, (error) => {
     if (error) {
       console.log(error);
-    } else {
-      console.log(0);
     }
+    console.log(0);
 
     return;
   });

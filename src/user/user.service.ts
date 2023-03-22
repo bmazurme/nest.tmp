@@ -8,10 +8,8 @@ import { RegisterDTO } from '../common/dto/register.dto';
 import { LoginDTO } from '../common/dto/login.dto';
 import { Payload } from '../common/payload';
 
-import sendMail from '../common/sendMail';
+import sendMail, { Email } from '../common/sendMail';
 import getToken from '../common/utils/getToken';
-
-import { CONFIRM } from '../common/constant';
 
 @Injectable()
 export class UserService {
@@ -32,7 +30,7 @@ export class UserService {
     });
     await createdUser.save();
 
-    sendMail(email, token, email, CONFIRM);
+    sendMail(email, token, email, Email.Confirm);
 
     return this.sanitizeUser(createdUser);
   }

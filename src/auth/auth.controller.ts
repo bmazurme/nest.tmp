@@ -6,9 +6,9 @@ import {
   Request,
   Get,
   Param,
+  Response,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
-
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 
@@ -36,6 +36,25 @@ export class AuthController {
     const token = await this.authService.signPayload(payload);
 
     return { token };
+  }
+
+  @Post('signinwithcookie')
+  async logint(@Body() loginDTO: LoginDTO, @Response() res) {
+    try {
+      const { email } = await this.userService.findByLogin(loginDTO);
+      const payload = { email };
+      const token = await this.authService.signPayload(payload);
+
+      res.cookie('jwt', token, {
+        expires: new Date(new Date().getTime() + 30 * 1000),
+        // sameSite: 'strict',
+        // httpOnly: true,
+      });
+
+      return res.send();
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Post('me')
