@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
+import { ClientModule } from '../client/client.module';
 import { PasswordModule } from '../password/password.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { PasswordModule } from '../password/password.module';
     ),
     UserModule,
     AuthModule,
+    ClientModule,
     PasswordModule,
   ],
   controllers: [AppController],

@@ -23,23 +23,14 @@ export class AuthController {
   ) {}
 
   @Post('signup')
-  async register(@Body() registerDTO: RegisterDTO) {
+  async signUp(@Body() registerDTO: RegisterDTO) {
     const user = await this.userService.create(registerDTO);
 
     return { user };
   }
 
   @Post('signin')
-  async login(@Body() loginDTO: LoginDTO) {
-    const { email } = await this.userService.findByLogin(loginDTO);
-    const payload = { email };
-    const token = await this.authService.signPayload(payload);
-
-    return { token };
-  }
-
-  @Post('signinwithcookie')
-  async logint(@Body() loginDTO: LoginDTO, @Response() res) {
+  async signIn(@Body() loginDTO: LoginDTO, @Response() res) {
     try {
       const { email } = await this.userService.findByLogin(loginDTO);
       const payload = { email };
@@ -59,8 +50,18 @@ export class AuthController {
 
   @Post('me')
   @UseGuards(AuthGuard('jwt'))
-  async getMe(@Request() req: any) {
+  async getMe(@Request() req) {
     return req.user;
+  }
+
+  @Get('signout')
+  @UseGuards(AuthGuard('jwt'))
+  async signOut(@Request() req, @Response() res) {
+    await req.logout();
+    res.clearCookie('jwt', { path: '/', httpOnly: true });
+    res.clearCookie('jwt.sig', { path: '/', httpOnly: true });
+
+    return res.redirect('/');
   }
 
   @Get('confirm/:code')

@@ -2,28 +2,17 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, VerifiedCallback } from 'passport-jwt';
 import { Strategy } from 'passport-jwt';
-import { Request } from 'express';
 
-import { AuthService } from './auth.service';
+import { ClientService } from './client.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(private authService: ClientService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        JwtStrategy.extractJWTFromCookie,
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.SECRET_KEY,
     });
-  }
-
-  private static extractJWTFromCookie(req: Request): string | null {
-    if (req.cookies && req.cookies.jwt) {
-      return req.cookies.jwt;
-    }
-
-    return null;
   }
 
   async validate(payload: any, done: VerifiedCallback) {
